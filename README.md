@@ -12,4 +12,5 @@ Imagenet Dateset url : http://www.image-net.org/
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 exp : Model checkpoint files save path
+
 dataset path : outside of this project path. (dataset too large)
