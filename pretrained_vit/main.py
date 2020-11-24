@@ -29,8 +29,10 @@ def main(opt):
 
     opt.device = torch.device('cuda:{}'.format(opt.gpus) if torch.cuda.is_available() else 'cpu')
     os.environ['CUDA_VISIBLE_DEVICES'] = opt.gpus
+    torch.cuda.set_device(opt.device)
     
-    Dataset = LoadImagesAndLabels(path=opt.data_path, img_size=(512, 512))
+    transforms = T.Compose([T.ToTensor()])
+    Dataset = LoadImagesAndLabels(path=opt.data_path, img_size=(512, 512), transforms=transforms)
     
     start_epoch = 0
     train_loader = torch.utils.data.DataLoader(
@@ -43,7 +45,8 @@ def main(opt):
             )
     
     model = VIT(img_size=512, patch_size=16)
-    optimizer = optim.Yogi(model.parameters(), opt.lr)
+    # optimizer = optim.Yogi(model.parameters(), opt.lr)
+    optimizer = torch.optim.Adam(model.parameters(), opt.lr)
     trainer = Trainer(opt, model, optimizer)
     trainer.set_device(opt.gpus, opt.device)
 
