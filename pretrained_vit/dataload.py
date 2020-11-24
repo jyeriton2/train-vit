@@ -20,7 +20,7 @@ def letterbox(img, height=608, width=1088, color=(127.5, 127.5, 127.5)):
     dw = (width - new_shape[0]) / 2     # width padding
     dh = (height - new_shape[1]) / 2    # height padding
     top, bottom = round(dh - 0.1), round(dh + 0.1)
-    left, right = round(dw - 0.1), round(dh + 0.1)
+    left, right = round(dw - 0.1), round(dw + 0.1)
 
     img = cv2.resize(img, new_shape, interpolation=cv2.INTER_AREA)  # resized, no border
     img = cv2.copyMakerBorder(img, top, bottom, left, right, cv2.BORDER_CONSTANT, value=color)  # padded rectangular
@@ -65,8 +65,7 @@ class LoadImagesAndLabels(Dataset):
         for imgs_folder_name, label in zip(img_folders_list, label_list):
             imgs_path = os.path.join(img_folders_path, imgs_folder_name)
             imgs_list = os.listdir(imgs_path)
-            one_hot = np.zeros(len(label_list))
-            one_hot[label_idx[label]] = 1
+            one_hot = label_idx[label]
 
             for img_file in imgs_list:
                 img_files.append(img_file)
@@ -97,6 +96,8 @@ class LoadImagesAndLabels(Dataset):
         h, w, _ = img.shape
         img, ratio, padw, padh = letterbox(img, height=height, width=width)
 
+        img /= 255.0
+        
         img = np.ascontiguousarray(img[:, :, ::-1])     # BGR to RGB
 
         if self.transforms is not None:
