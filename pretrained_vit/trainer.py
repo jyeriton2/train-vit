@@ -1,5 +1,6 @@
 import os, sys
 import torch
+from torch.autograd import Variable
 from progress.bar import Bar
 
 class Trainer(object):
@@ -11,6 +12,8 @@ class Trainer(object):
             self.optimizer = torch.optim.SGD(model.parameters(), opt.lr)
         self.model = model
         self.loss = torch.nn.CrossEntropyLoss()
+        self.optimizer.add_param_group({'params': self.loss.parameters()})
+        self.device = None
         
     def set_device(self, gpus, device):
         if len(gpus) < 1:
@@ -18,6 +21,11 @@ class Trainer(object):
             sys.exit()
         self.model = self.model.to(device)
         self.loss = self.loss.to(device)
+        self.device = device
+        for state in self.optimizer.state.values():
+            for k,v in state.items():
+                if isinstance(v, torch.Tensor):
+                    state[k] = v.to(device=device, non_blocking=True)
 
     def run_epoch(self, phase, epoch, data_loader):
         loss = self.loss
@@ -36,8 +44,15 @@ class Trainer(object):
             if iter_id >= num_iters:
                 break
             
-            out, loss, loss_states = loss(batch)
-            loss = loss.mean()
+            if self.device is not None:
+                _in = batch['image'].cuda()
+                _label = batch['label'].cuda()
+            else:
+                _in = batch['image']
+                _label = batch['label']
+
+            _loss = loss(Variable(self.model(_in), requires_grad=True), Variable(_label))
+            _loss = _loss.mean()
             if phase == 'train':
                 self.optimizer.zero_grad()
                 loss.backward()
