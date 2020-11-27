@@ -313,10 +313,10 @@ class VIT(nn.Module):
             img_size=img_size, patch_size=patch_size, in_chans=in_chans)
 
         self.fc_module = nn.Sequential(
-                nn.Linear(3*170*170, 43850),
+                nn.Linear(3*128*128, 25076),
                 nn.GELU(),
                 nn.Dropout(p=0.5),
-                nn.Linear(43850, 1000),
+                nn.Linear(25076, 1000),
                 nn.Sigmoid()
                 )
 
@@ -350,7 +350,7 @@ class VIT(nn.Module):
         x = x[:, 1:]
 
         x = self.inv_patch(x)
-        x = nn.MaxPool2d(3)(x)
+        x = nn.MaxPool2d(4)(x)
         x = self.fc_module(x.flatten(1))
         return x
 
