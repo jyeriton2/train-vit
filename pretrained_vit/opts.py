@@ -9,8 +9,8 @@ class opts(object):
 
         
         self.parser.add_argument('--gpus', default='1')
-        self.parser.add_argument('--num_workers', type=int, default=8)
-        self.parser.add_argument('--batch_size', type=int, default=32)
+        self.parser.add_argument('--num_workers', type=int, default=6)
+        self.parser.add_argument('--batch_size', type=int, default=12)
         self.parser.add_argument('--num_iters', type=int, default=-1)
         self.parser.add_argument('--lr', type=float, default=1e-4)
         self.parser.add_argument('--num_epochs', type=int, default=100)
