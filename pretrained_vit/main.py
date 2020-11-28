@@ -25,10 +25,11 @@ def save_model(path, epoch, model, optimizer=None):
 
 def main(opt):
     torch.manual_seed(114)
+    torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = True
 
-    opt.device = torch.device('cuda:{}'.format(opt.gpus) if torch.cuda.is_available() else 'cpu')
     os.environ['CUDA_VISIBLE_DEVICES'] = opt.gpus
+    opt.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     torch.cuda.set_device(opt.device)
     
     transforms = T.Compose([T.ToTensor()])
